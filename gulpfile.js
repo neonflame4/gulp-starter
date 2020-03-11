@@ -63,6 +63,7 @@ task('scss:compile', () => {
         }))
         .pipe(concat('styles.css'))
         .pipe(sourcemaps.write('./maps'))
+        .pipe(browserSync.stream())
         .pipe(dest(DIR_OUTPUT_CSS()));
 });
 
@@ -134,12 +135,12 @@ task('serve', (cb) => {
     cb();
 });
 
-task('watch', (cb) => {
+task('watch', (c1) => {
     series('dest_clean')();
 
     watch( DIR_INPUT_SCSS )
         .on('ready', series('scss:compile'))
-        .on('change', series('scss:compile', browserSync.reload('*.css')));
+        .on('change', series('scss:compile'));
 
     watch( DIR_INPUT_HTML )
         .on('ready', series('html:copy'))
