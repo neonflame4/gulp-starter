@@ -4,6 +4,7 @@ const { task, watch, src, dest, series, parallel } = require("gulp"),
     sass = require("gulp-sass"),
     concat = require("gulp-concat"),
     minify = require("gulp-minify"),
+    panini = require("panini"),
     sourcemaps = require("gulp-sourcemaps"),
     browserSync = require("browser-sync").create()
 ;
@@ -19,8 +20,8 @@ const
 
 const 
     DIR_INPUT_FONTS = SRC_PATH + '/assets/fonts/**/*.scss',
-    DIR_INPUT_HTML =  [SRC_PATH + '/**/*.{htm,html,xhtml,php}', '!'+SRC_PATH+'/assets'],
-    DIR_INPUT_HTML_A =  SRC_PATH + '/**/*.{htm,html,xhtml,php}',
+    DIR_INPUT_HTML =  [SRC_PATH + '/**/*.{htm,html,xhtml,php}', '!'+SRC_PATH + '/assets/**/*', '!'+SRC_PATH + '/templates/**/*'],
+    DIR_INPUT_HTML_A =  '/templates/**/*.html',
     DIR_INPUT_IMAGES = SRC_PATH + '/assets/images/**/*',
     DIR_INPUT_JS = [SRC_PATH + '/assets/js/**/*', '!' + SRC_PATH + '/assets/js/vendor/**/*.js'],
     DIR_INPUT_VENDOR_JS = SRC_PATH + '/assets/js/vendor/**/*.js',
@@ -159,39 +160,38 @@ task('serve', (cb) => {
     browserSync.init({
         server: {
             baseDir: "./public/",
-            injectChanges: true
-        }
+            injectChanges: true,
+            reloadDebounce: 2000
+        },
     });
     cb();
 });
 
 task('watch', (c1) => {
-    series('dest_clean')();
+    series('dest_clean', 'fonts:copy','serve')();
 
     watch( DIR_INPUT_SCSS )
-        .on('ready', series('scss:compile'))
+        .on('ready', series('scss:compile', browserSync.reload))
         .on('change', series('scss:compile'));
 
     watch( DIR_INPUT_HTML )
-        .on('ready', series('html:generate'))
-        .on('change', series('html:generate', panini.refresh(), browserSync.reload));
+        .on('ready', series('html:copy','html:generate', browserSync.reload))
+        .on('change', series('html:copy','html:generate', panini.refresh, browserSync.reload));
 
     watch( DIR_INPUT_JS )
-        .on('ready', series('js'))
+        .on('ready', series('js', browserSync.reload))
         .on('change', series('js', browserSync.reload));
 
     watch( DIR_INPUT_IMAGES )
         .on('ready', series('images:copy'))
         .on('change', series('images:copy'));
-
-    series('fonts:copy','serve')();
 });
 
 task('build', c1 => {
     isBuild = true;
     
     series('dest_clean', c2 => {
-        parallel('html:copy','scss:build','js:build','images:copy','fonts:copy')();
+        parallel('html:copy','html:generate','scss:build','js:build','images:copy','fonts:copy')();
         c2();
     })();
     
