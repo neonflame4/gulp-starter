@@ -132,4 +132,4 @@ task('watch', (cb) => {
     series('fonts:copy','serve')();
 });
 
-task('build', series('clean','html:copy','scss','js:copy','images:copy','fonts:copy'));
+task('build', series('dest_clean','html:copy','scss','js:copy','images:copy','fonts:copy'));
