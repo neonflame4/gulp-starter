@@ -19,7 +19,8 @@ const
 
 const 
     DIR_INPUT_FONTS = SRC_PATH + '/assets/fonts/**/*.scss',
-    DIR_INPUT_HTML =  [SRC_PATH + '/**/*.html', '!'+SRC_PATH+'/assets'],
+    DIR_INPUT_HTML =  [SRC_PATH + '/**/*.{htm,html,xhtml,php}', '!'+SRC_PATH+'/assets'],
+    DIR_INPUT_HTML_A =  SRC_PATH + '/**/*.{htm,html,xhtml,php}',
     DIR_INPUT_IMAGES = SRC_PATH + '/assets/images/**/*',
     DIR_INPUT_JS = [SRC_PATH + '/assets/js/**/*', '!' + SRC_PATH + '/assets/js/vendor/**/*.js'],
     DIR_INPUT_VENDOR_JS = SRC_PATH + '/assets/js/vendor/**/*.js',
@@ -94,6 +95,16 @@ task('html:copy', () => {
         .pipe(dest(getOutputPath()));
 });
 
+task('html:generate', () => {
+    return src(DIR_INPUT_HTML_A)
+        .pipe(panini({
+            root: 'templates/pages/',
+            layouts: 'templates/layouts/',
+            partials: 'templates/partials/'
+        }))
+        .pipe(dest(getOutputPath()));
+});
+
 
 
 
@@ -162,8 +173,8 @@ task('watch', (c1) => {
         .on('change', series('scss:compile'));
 
     watch( DIR_INPUT_HTML )
-        .on('ready', series('html:copy'))
-        .on('change', series('html:copy', browserSync.reload));
+        .on('ready', series('html:generate'))
+        .on('change', series('html:generate', panini.refresh(), browserSync.reload));
 
     watch( DIR_INPUT_JS )
         .on('ready', series('js'))
