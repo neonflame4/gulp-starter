@@ -1,14 +1,18 @@
-const { task, watch, src, dest, series } = require("gulp"),
+const { task, watch, src, dest, series, parallel } = require("gulp"),
     autoprefixer = require("gulp-autoprefixer")
     clean = require("gulp-clean"),
     sass = require("gulp-sass"),
+    concat = require("gulp-concat");
     sourcemaps = require("gulp-sourcemaps"),
     browserSync = require("browser-sync").create()
 ;
 
+
+let isBuild = false;
 const
     SRC_PATH = './src',
-    DEST_PATH = './dist'
+    DIST_PATH = './dist',
+    PUBLIC_PATH = './public'
 ;
 
 
@@ -21,17 +25,19 @@ const
 ;
 
 const 
-    DIR_OUTPUT_CSS = DEST_PATH + '/assets/css',
-    DIR_OUTPUT_FONTS = DEST_PATH + '/assets/fonts',
-    DIR_OUTPUT_IMAGES = DEST_PATH + '/assets/images',
-    DIR_OUTPUT_JS = DEST_PATH + '/assets/js'
+    DIR_OUTPUT_CSS = function(){ return getOutputPath() + '/assets/css'},
+    DIR_OUTPUT_FONTS = function(){ return getOutputPath() + '/assets/fonts'},
+    DIR_OUTPUT_IMAGES = function(){ return getOutputPath() + '/assets/images'},
+    DIR_OUTPUT_JS = function(){ return getOutputPath() + '/assets/js'}
 ;
 
-
+function getOutputPath() {
+    return isBuild ? DIST_PATH : PUBLIC_PATH;
+}
 
 
 task('dest_clean', () => {
-    return src(DEST_PATH, {read: false, allowEmpty: true})
+    return src(getOutputPath(), {read: false, allowEmpty: true})
         .pipe(clean());
 });
 
@@ -40,7 +46,7 @@ task('dest_clean', () => {
 
 /* ****************** SCSS TASKS ******************* */
 task('scss:clean', () => {
-    return src(DIR_OUTPUT_CSS, {read: false, allowEmpty: true})
+    return src(DIR_OUTPUT_CSS(), {read: false, allowEmpty: true})
         .pipe(clean());
 });
     
@@ -55,8 +61,25 @@ task('scss:compile', () => {
         .pipe(autoprefixer({
             overrideBrowserslist: ['cover 99.5% in US']
         }))
+        .pipe(concat('styles.css'))
         .pipe(sourcemaps.write('./maps'))
-        .pipe(dest(DIR_OUTPUT_CSS));
+        .pipe(dest(DIR_OUTPUT_CSS()));
+});
+
+task('scss:build', () => {
+    return src(DIR_INPUT_SCSS)
+        .pipe(sourcemaps.init())
+        .pipe(sass({
+                outputStyle: 'compressed',
+                sourceMap: true
+            })
+            .on('error', sass.logError))
+        .pipe(autoprefixer({
+            overrideBrowserslist: ['cover 99.5% in US']
+        }))
+        .pipe(concat('styles.css'))
+        .pipe(sourcemaps.write('./maps'))
+        .pipe(dest(DIR_OUTPUT_CSS()));
 });
 
 task('scss', series('scss:clean', 'scss:compile'));
@@ -67,7 +90,7 @@ task('scss', series('scss:clean', 'scss:compile'));
 /* ****************** HTML TASKS ******************* */
 task('html:copy', () => {
     return src(DIR_INPUT_HTML)
-        .pipe(dest(DEST_PATH));
+        .pipe(dest(getOutputPath()));
 });
 
 
@@ -76,7 +99,7 @@ task('html:copy', () => {
 /* ****************** JAVASCRIPT TASKS ************* */
 task('js:copy', () => {
     return src(DIR_INPUT_JS)
-        .pipe(dest(DIR_OUTPUT_JS));
+        .pipe(dest(DIR_OUTPUT_JS()));
 });
 
 
@@ -85,7 +108,7 @@ task('js:copy', () => {
 /* ****************** IMAGE TASKS ****************** */
 task('images:copy', () => {
     return src(DIR_INPUT_IMAGES)
-        .pipe(dest(DIR_OUTPUT_IMAGES));
+        .pipe(dest(DIR_OUTPUT_IMAGES()));
 });
 
 
@@ -94,7 +117,7 @@ task('images:copy', () => {
 /* ****************** FONT TASKS ******************* */
 task('fonts:copy', () => {
     return src(DIR_INPUT_FONTS)
-        .pipe(dest(DIR_OUTPUT_FONTS));
+        .pipe(dest(DIR_OUTPUT_FONTS()));
 });
 
 
@@ -104,7 +127,8 @@ task('fonts:copy', () => {
 task('serve', (cb) => {
     browserSync.init({
         server: {
-            baseDir: "./dist/"
+            baseDir: "./public/",
+            injectChanges: true
         }
     });
     cb();
@@ -114,8 +138,8 @@ task('watch', (cb) => {
     series('dest_clean')();
 
     watch( DIR_INPUT_SCSS )
-        .on('ready', series('scss'))
-        .on('change', series('scss', browserSync.reload));
+        .on('ready', series('scss:compile'))
+        .on('change', series('scss:compile', browserSync.reload('*.css')));
 
     watch( DIR_INPUT_HTML )
         .on('ready', series('html:copy'))
@@ -132,4 +156,13 @@ task('watch', (cb) => {
     series('fonts:copy','serve')();
 });
 
-task('build', series('dest_clean','html:copy','scss','js:copy','images:copy','fonts:copy'));
+task('build', c1 => {
+    isBuild = true;
+    
+    series('dest_clean', c2 => {
+        parallel('html:copy','scss:build','js:copy','images:copy','fonts:copy')();
+        c2();
+    })();
+    
+    c1();
+});

@@ -104,6 +104,10 @@ dist
 
 # TernJS port file
 .tern-port
+
+#Intellij
+.idea/
+
 # ignore node_modules symlink
 node_modules/.bin/browserslist
 node_modules/.bin/not-in-publish
