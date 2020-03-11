@@ -17,5 +17,8 @@
     "gulp-scss": "^1.4.0",
     "gulp-sourcemaps": "^2.6.5"
   },
-  "dependencies": {}
+  "dependencies": {
+    "lodash": "^4.17.15",
+    "lodash.template": "^4.5.0"
+  }
 }
