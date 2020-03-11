@@ -9,11 +9,16 @@
   "author": "Mark Nagengast",
   "license": "ISC",
   "devDependencies": {
-    "autoprefixer": "^9.7.4",
+    "browser-sync": "^2.26.7",
     "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^7.0.1",
     "gulp-clean": "^0.4.0",
     "gulp-sass": "^4.0.2",
     "gulp-scss": "^1.4.0",
     "gulp-sourcemaps": "^2.6.5"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15",
+    "lodash.template": "^4.5.0"
   }
 }
