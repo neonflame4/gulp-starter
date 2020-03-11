@@ -6,17 +6,29 @@ const { task, watch, src, dest, series } = require("gulp"),
     browserSync = require("browser-sync").create()
 ;
 
-const SRC_PATH = './src',
-      DEST_PATH = './dist';
+const
+    SRC_PATH = './src',
+    DEST_PATH = './dist'
+;
 
-const DIR_INPUT_SCSS = SRC_PATH + '/assets/scss/**/*.scss',
-      DIR_INPUT_HTML =  [SRC_PATH + '/**/*.html', '!'+SRC_PATH+'/assets'],
-      DIR_INPUT_IMAGES = SRC_PATH + '/assets/images/**/*',
-      DIR_INPUT_JS = SRC_PATH + '/assets/js/**/*';
 
-const DIR_OUTPUT_CSS = DEST_PATH + '/assets/css',
-      DIR_OUTPUT_IMAGES = DEST_PATH + '/assets/images',
-      DIR_OUTPUT_JS = DEST_PATH + '/assets/js';
+const 
+    DIR_INPUT_FONTS = SRC_PATH + '/assets/fonts/**/*.scss',
+    DIR_INPUT_HTML =  [SRC_PATH + '/**/*.html', '!'+SRC_PATH+'/assets'],
+    DIR_INPUT_IMAGES = SRC_PATH + '/assets/images/**/*',
+    DIR_INPUT_JS = SRC_PATH + '/assets/js/**/*',
+    DIR_INPUT_SCSS = SRC_PATH + '/assets/scss/**/*.scss'
+;
+
+const 
+    DIR_OUTPUT_CSS = DEST_PATH + '/assets/css',
+    DIR_OUTPUT_FONTS = DEST_PATH + '/assets/fonts',
+    DIR_OUTPUT_IMAGES = DEST_PATH + '/assets/images',
+    DIR_OUTPUT_JS = DEST_PATH + '/assets/js'
+;
+
+
+
 
 task('dest_clean', () => {
     return src(DEST_PATH, {read: false, allowEmpty: true})
@@ -79,6 +91,15 @@ task('images:copy', () => {
 
 
 
+/* ****************** FONT TASKS ******************* */
+task('fonts:copy', () => {
+    return src(DIR_INPUT_FONTS)
+        .pipe(dest(DIR_OUTPUT_FONTS));
+});
+
+
+
+
 /* ****************** BUILD TASKS ****************** */
 task('serve', (cb) => {
     browserSync.init({
@@ -108,7 +129,7 @@ task('watch', (cb) => {
         .on('ready', series('images:copy'))
         .on('change', series('images:copy'));
 
-    series('serve')();
+    series('fonts:copy','serve')();
 });
 
-task('build', series('html:copy','scss'));
+task('build', series('clean','html:copy','scss','js:copy','images:copy','fonts:copy'));
