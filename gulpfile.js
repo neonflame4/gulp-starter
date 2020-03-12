@@ -21,7 +21,7 @@ const
 const 
     DIR_INPUT_FONTS = SRC_PATH + '/assets/fonts/**/*.scss',
     DIR_INPUT_HTML =  [SRC_PATH + '/**/*.{htm,html,xhtml,php}', '!'+SRC_PATH + '/assets/**/*', '!'+SRC_PATH + '/templates/**/*'],
-    DIR_INPUT_HTML_A =  '/templates/**/*.html',
+    DIR_INPUT_HTML_TEMPLATES = SRC_PATH + '/templates';
     DIR_INPUT_IMAGES = SRC_PATH + '/assets/images/**/*',
     DIR_INPUT_JS = [SRC_PATH + '/assets/js/**/*', '!' + SRC_PATH + '/assets/js/vendor/**/*.js'],
     DIR_INPUT_VENDOR_JS = SRC_PATH + '/assets/js/vendor/**/*.js',
@@ -39,9 +39,13 @@ function getOutputPath() {
     return isBuild ? DIST_PATH : PUBLIC_PATH;
 }
 
+function paniniRefresh(done) {
+    panini.refresh();
+    done();
+}
 
 task('dest_clean', () => {
-    return src(getOutputPath(), {read: false, allowEmpty: true})
+    return src([DIST_PATH, PUBLIC_PATH], {read: false, allowEmpty: true})
         .pipe(clean());
 });
 
@@ -97,11 +101,11 @@ task('html:copy', () => {
 });
 
 task('html:generate', () => {
-    return src(DIR_INPUT_HTML_A)
+    return src(DIR_INPUT_HTML_TEMPLATES + '/pages/**/*.html')
         .pipe(panini({
-            root: 'templates/pages/',
-            layouts: 'templates/layouts/',
-            partials: 'templates/partials/'
+            root:      DIR_INPUT_HTML_TEMPLATES + '/pages/',
+            layouts:   DIR_INPUT_HTML_TEMPLATES + '/layouts/',
+            partials:  DIR_INPUT_HTML_TEMPLATES + '/partials/'
         }))
         .pipe(dest(getOutputPath()));
 });
@@ -161,31 +165,37 @@ task('serve', (cb) => {
         server: {
             baseDir: "./public/",
             injectChanges: true,
-            reloadDebounce: 2000
         },
     });
     cb();
 });
 
 task('watch', (c1) => {
-    series('dest_clean', 'fonts:copy','serve')();
+    series('dest_clean','html:generate','fonts:copy','serve')();
 
     watch( DIR_INPUT_SCSS )
-        .on('ready', series('scss:compile', browserSync.reload))
+        .on('ready', series('scss:compile'))
         .on('change', series('scss:compile'));
 
-    watch( DIR_INPUT_HTML )
-        .on('ready', series('html:copy','html:generate', browserSync.reload))
-        .on('change', series('html:copy','html:generate', panini.refresh, browserSync.reload));
+    /* TO USE index.html files in root dir, use this */
+    // watch( DIR_INPUT_HTML )
+    //     .on('ready', series('html:copy'))
+    //     .on('change', series('html:copy', browserSync.reload));
+
+    /* TO USE constructed .html files, use this: */
+    watch( DIR_INPUT_HTML_TEMPLATES + '/**/*.html' )
+        .on('all', series(paniniRefresh, 'html:generate', browserSync.reload));
 
     watch( DIR_INPUT_JS )
-        .on('ready', series('js', browserSync.reload))
+        .on('ready', series('js'))
         .on('change', series('js', browserSync.reload));
 
     watch( DIR_INPUT_IMAGES )
         .on('ready', series('images:copy'))
         .on('change', series('images:copy'));
 });
+
+task('clean:all', series('dest_clean'));
 
 task('build', c1 => {
     isBuild = true;
