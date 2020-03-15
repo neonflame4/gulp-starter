@@ -144,6 +144,7 @@ task('js', () => {
 /* ****************** IMAGE TASKS ****************** */
 task('images:copy', () => {
     return src(DIR_INPUT_IMAGES)
+        .pipe(browserSync.stream())
         .pipe(dest(DIR_OUTPUT_IMAGES()));
 });
 
