@@ -134,9 +134,12 @@ task('js:build', () => {
         .pipe(dest(DIR_OUTPUT_JS()));
 });
 
-task('js', () => {
-    parallel('js:compile','js:vendor');
-});
+task('js',
+    series(
+        parallel('js:compile','js:vendor'),
+        browserSync.reload
+    )
+);
 
 
 
