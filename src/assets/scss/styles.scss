@@ -3,30 +3,30 @@
 @import "resets";
 
 html, body {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 body {
-    background: black;
-    color: white;
-    font-family: Arial;
+  background: black;
+  color: white;
+  font-family: Arial;
 }
 
 a {
-    color: #FFF;
+  color: #FFF;
 }
 
 header {
-    width: 100%;
-    min-height: 100px;
-    background: blue;
+  width: 100%;
+  min-height: 150px;
+  background: linear-gradient(blue, #000);
 }
 
 footer {
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-    left: 0;
-    min-height: 100px;
-    background: green;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  min-height: 150px;
+  background: linear-gradient(#000, green);
 }
