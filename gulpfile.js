@@ -1,12 +1,14 @@
 const { task, watch, src, dest, series, parallel } = require( 'gulp' ),
-      autoprefixer                                 = require( 'gulp-autoprefixer' );
-clean = require( 'gulp-clean' ),
-    sass = require( 'gulp-sass' ),
-    concat = require( 'gulp-concat' ),
-    minify = require( 'gulp-minify' ),
-    panini = require( 'panini' ),
-    sourcemaps = require( 'gulp-sourcemaps' ),
-    browserSync = require( 'browser-sync' ).create()
+      postcss                                      = require( 'gulp-postcss' ),
+      clean                                        = require( 'gulp-clean' ),
+      sass                                         = require( 'gulp-sass' ),
+      autoprefixer                                 = require( 'autoprefixer' ),
+      concat                                       = require( 'gulp-concat' ),
+      minify                                       = require( 'gulp-minify' ),
+      babel                                        = require( 'gulp-babel' ),
+      panini                                       = require( 'panini' ),
+      sourcemaps                                   = require( 'gulp-sourcemaps' ),
+      browserSync                                  = require( 'browser-sync' ).create()
 ;
 
 
@@ -69,9 +71,9 @@ task( 'scss:compile', () => {
         sourceMap: true,
       } )
           .on( 'error', sass.logError ) )
-      .pipe( autoprefixer( {
-        overrideBrowserslist: ['cover 99.5% in US'],
-      } ) )
+      .pipe( postcss( [
+        autoprefixer(),
+      ] ) )
       .pipe( concat( 'styles.css' ) )
       .pipe( sourcemaps.write( './maps' ) )
       .pipe( browserSync.stream() )
@@ -85,9 +87,9 @@ task( 'scss:build', () => {
         sourceMap: true,
       } )
           .on( 'error', sass.logError ) )
-      .pipe( autoprefixer( {
-        overrideBrowserslist: ['cover 99.5% in US'],
-      } ) )
+      .pipe( postcss( [
+        autoprefixer(),
+      ] ) )
       .pipe( concat( 'styles.css' ) )
       .pipe( dest( DIR_OUTPUT_CSS() ) );
 } );
@@ -126,6 +128,9 @@ task( 'js:vendor', () => {
 task( 'js:compile', () => {
   return src( DIR_INPUT_JS )
       .pipe( sourcemaps.init() )
+      .pipe( babel( {
+        presets: ['@babel/env'],
+      } ) )
       .pipe( concat( 'bundle.js' ) )
       .pipe( sourcemaps.write( './maps' ) )
       .pipe( dest( DIR_OUTPUT_JS() ) );
@@ -133,6 +138,9 @@ task( 'js:compile', () => {
 
 task( 'js:build', () => {
   return src( DIR_INPUT_JS )
+      .pipe( babel( {
+        presets: ['@babel/env'],
+      } ) )
       .pipe( concat( 'bundle.js' ) )
       .pipe( minify() )
       .pipe( dest( DIR_OUTPUT_JS() ) );
