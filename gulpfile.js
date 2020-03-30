@@ -35,7 +35,7 @@ const
     ],
     DIR_INPUT_VENDOR_JS      = SRC_PATH + '/assets/js/vendor/**/*.js',
     DIR_INPUT_SCSS           = SRC_PATH + '/assets/scss/**/*.scss',
-    DIR_INPUT_COPYTEXT       = SRC_PATH + '/copy'
+    DIR_INPUT_COPYTEXT       = SRC_PATH + '/data'
 ;
 
 const
