@@ -1,15 +1,16 @@
 const { task, watch, src, dest, series, parallel } = require( 'gulp' ),
-      postcss                                      = require( 'gulp-postcss' ),
-      clean                                        = require( 'gulp-clean' ),
-      sass                                         = require( 'gulp-sass' ),
+      args                                         = require( 'yargs' ).argv,
       autoprefixer                                 = require( 'autoprefixer' ),
-      concat                                       = require( 'gulp-concat' ),
-      minify                                       = require( 'gulp-minify' ),
       babel                                        = require( 'gulp-babel' ),
-      panini                                       = require( 'panini' ),
-      sourcemaps                                   = require( 'gulp-sourcemaps' ),
+      browserSync                                  = require( 'browser-sync' ).create(),
+      clean                                        = require( 'gulp-clean' ),
+      concat                                       = require( 'gulp-concat' ),
       imageResize                                  = require( 'gulp-image-resize' ),
-      browserSync                                  = require( 'browser-sync' ).create()
+      minify                                       = require( 'gulp-minify' ),
+      panini                                       = require( 'panini' ),
+      postcss                                      = require( 'gulp-postcss' ),
+      sass                                         = require( 'gulp-sass' ),
+      sourcemaps                                   = require( 'gulp-sourcemaps' )
 ;
 
 
@@ -18,7 +19,7 @@ const config = {
   image_max_width: 1024,
   image_max_height: 1024,
   thumbnail_max_width: 200,
-  thumbnail_max_width: 200,
+  thumbnail_max_height: 200,
 };
 
 
@@ -38,7 +39,7 @@ const
     ],
     DIR_INPUT_HTML_TEMPLATES = SRC_PATH + '/templates',
     DIR_INPUT_IMAGES         = SRC_PATH + '/assets/images/**/*',
-    DIR_INPUT_PROCESS_IMAGES = SRC_PATH + '/assets/images/gallery',
+    DIR_INPUT_PROCESS_IMAGES = SRC_PATH + '/assets/images',
     DIR_INPUT_JS             = [
       SRC_PATH + '/assets/js/**/*',
       '!' + SRC_PATH + '/assets/js/vendor/**/*.js',
@@ -174,9 +175,8 @@ task( 'images:copy', () => {
       .pipe( dest( DIR_OUTPUT_IMAGES() ) );
 } );
 
-
 task( 'images:process', () => {
-  return src( DIR_INPUT_PROCESS_IMAGES + '**/*' )
+  return src( DIR_INPUT_PROCESS_IMAGES + '**/*.{jpg,jpeg,png,gif}' )
       .pipe( imageResize( {
         quality: 0.5,
         height: config.image_max_height,
@@ -184,6 +184,19 @@ task( 'images:process', () => {
       } ) )
       .pipe( browserSync.stream() )
       .pipe( dest( DIR_OUTPUT_IMAGES() ) );
+} );
+
+task( 'images:thumbnail', cb => {
+  if (!args[ 'folder' ])
+    cb();
+  
+  return src( DIR_INPUT_PROCESS_IMAGES + '/' + args.folder + '/*.{jpg,jpeg,png,gif}' )
+      .pipe( imageResize( {
+        quality: 1,
+        height: config.thumbnail_max_height,
+        width: config.thumbnail_max_width,
+      } ) )
+      .pipe( dest( DIR_INPUT_PROCESS_IMAGES + '/' + args.folder + '_thumb' ) );
 } );
 
 
