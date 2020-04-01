@@ -37,8 +37,8 @@ For image processing support, you will additionally need to install imagemagick:
 
 Ubuntu:
 ```
-apt-get install imagemagick
-apt-get install graphicsmagick
+sudo apt-get install imagemagick
+sudo apt-get install graphicsmagick
 ```
 
 Mac OS X (using Homebrew):
