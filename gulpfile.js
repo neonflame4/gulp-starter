@@ -41,6 +41,7 @@ const
     DIR_INPUT_HTML_TEMPLATES = SRC_PATH + '/templates',
     DIR_INPUT_IMAGES         = SRC_PATH + '/assets/images/**/*',
     DIR_INPUT_PROCESS_IMAGES = SRC_PATH + '/assets/images',
+    DIR_INPUT_JS_BASE        = SRC_PATH + '/assets/js',
     DIR_INPUT_JS             = [
       SRC_PATH + '/assets/js/**/*.js',
       '!' + SRC_PATH + '/assets/js/vendor/**/*.js',
@@ -48,6 +49,7 @@ const
     DIR_INPUT_VENDOR_JS      = [
       SRC_PATH + '/assets/js/**/*',
       '!' + SRC_PATH + '/assets/js/**/*.js',
+      SRC_PATH + '/assets/js/vendor/**/*',
     ],
     DIR_INPUT_SCSS           = SRC_PATH + '/assets/scss/**/*.scss',
     DIR_INPUT_COPYTEXT       = SRC_PATH + '/data',
@@ -136,12 +138,12 @@ task( 'html:generate', () => {
 
 /* ****************** JAVASCRIPT TASKS ************* */
 task( 'js:vendor', () => {
-  return src( DIR_INPUT_VENDOR_JS )
+  return src( DIR_INPUT_VENDOR_JS, { base: DIR_INPUT_JS_BASE } )
       .pipe( dest( DIR_OUTPUT_JS() ) );
 } );
 
 task( 'js:compile', () => {
-  return src( DIR_INPUT_JS )
+  return src( DIR_INPUT_JS, { base: DIR_INPUT_JS_BASE } )
       .pipe( sourcemaps.init() )
       .pipe( babel( {
         presets: ['@babel/env'],
@@ -152,7 +154,7 @@ task( 'js:compile', () => {
 } );
 
 task( 'js:build', () => {
-  return src( DIR_INPUT_JS )
+  return src( DIR_INPUT_JS, { base: DIR_INPUT_JS_BASE } )
       .pipe( babel( {
         presets: ['@babel/env'],
       } ) )
