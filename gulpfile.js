@@ -177,7 +177,7 @@ task( 'images:copy', () => {
 } );
 
 task( 'images:process', () => {
-  return src( DIR_INPUT_PROCESS_IMAGES + '**/*.{jpg,jpeg,png,gif}' )
+  return src( DIR_INPUT_PROCESS_IMAGES + '/**/*.{jpg,jpeg,png,gif}' )
       .pipe( imageResize( {
         quality: 0.5,
         height: config.image_max_height,
