@@ -32,18 +32,20 @@ cd gulp-starter
 npm install
 ```
 
+You can edit the basic configurations by editing your gulpfile.js.
 
-For image processing support, you will additionally need to install imagemagick:
 
-Ubuntu:
+For image processing support, you will additionally need to install the graphicsmagick dependency:
+
+Ubuntu/WSL:
 ```
-apt-get install imagemagick
-apt-get install graphicsmagick
+sudo add-apt-repository ppa:dhor/myway
+sudo apt-get update
+sudo apt-get install graphicsmagick
 ```
 
 Mac OS X (using Homebrew):
 ``` 
-brew install imagemagick
 brew install graphicsmagick
 ```
 
