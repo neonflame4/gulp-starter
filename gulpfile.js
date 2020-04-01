@@ -20,6 +20,7 @@ const config = {
   image_max_height: 1024,
   thumbnail_max_width: 200,
   thumbnail_max_height: 200,
+  use_imagemagick: false,
 };
 
 
@@ -181,6 +182,7 @@ task( 'images:process', () => {
         quality: 0.5,
         height: config.image_max_height,
         width: config.image_max_width,
+        imageMagick: config.use_imagemagick,
       } ) )
       .pipe( browserSync.stream() )
       .pipe( dest( DIR_OUTPUT_IMAGES() ) );
@@ -195,6 +197,7 @@ task( 'images:thumbnail', cb => {
         quality: 1,
         height: config.thumbnail_max_height,
         width: config.thumbnail_max_width,
+        imageMagick: config.use_imagemagick,
       } ) )
       .pipe( dest( DIR_INPUT_PROCESS_IMAGES + '/' + args.folder + '_thumb' ) );
 } );
