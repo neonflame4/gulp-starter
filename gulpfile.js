@@ -18,8 +18,8 @@ let isBuild  = false;
 const config = {
   image_max_width: 1024,
   image_max_height: 1024,
-  thumbnail_max_width: 200,
-  thumbnail_max_height: 200,
+  thumbnail_max_width: 250,
+  thumbnail_max_height: 250,
   use_imagemagick: false,
 };
 
@@ -43,7 +43,7 @@ const
     DIR_INPUT_PROCESS_IMAGES = SRC_PATH + '/assets/images',
     DIR_INPUT_JS_BASE        = SRC_PATH + '/assets/js',
     DIR_INPUT_JS             = [
-      SRC_PATH + '/assets/js/**/*.js',
+      SRC_PATH + '/assets/js/**/*.{js,json}',
       '!' + SRC_PATH + '/assets/js/vendor/**/*.js',
     ],
     DIR_INPUT_VENDOR_JS      = [
