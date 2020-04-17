@@ -44,10 +44,12 @@ const
     DIR_INPUT_JS_BASE        = SRC_PATH + '/assets/js',
     DIR_INPUT_JS_BUILD       = [
       SRC_PATH + '/assets/js/**/*.js',
+      '!' + SRC_PATH + '/assets/js/**/_*.js',
       '!' + SRC_PATH + '/assets/js/vendor/**/*.js',
     ],
     DIR_INPUT_JS             = [
       SRC_PATH + '/assets/js/**/*.{js,json}',
+      '!' + SRC_PATH + '/assets/js/**/_*.{js,json}',
       '!' + SRC_PATH + '/assets/js/vendor/**/*.js',
     ],
     DIR_INPUT_VENDOR_JS      = [
@@ -133,7 +135,7 @@ task( 'html:generate', () => {
         layouts: DIR_INPUT_HTML_TEMPLATES + '/layouts/',
         partials: DIR_INPUT_HTML_TEMPLATES + '/partials/',
         helpers: SRC_PATH + '/helpers/',
-        data: isBuild ? [DIR_INPUT_COPYTEXT, DIR_INPUT_COPYTEXT_PROD] : DIR_INPUT_COPYTEXT
+        data: isBuild ? [DIR_INPUT_COPYTEXT, DIR_INPUT_COPYTEXT_PROD] : DIR_INPUT_COPYTEXT,
       } ) )
       .pipe( dest( getOutputPath() ) );
 } );
@@ -164,12 +166,12 @@ task( 'js:build', () => {
         presets: ['@babel/env'],
       } ) )
       .pipe( concat( 'bundle.js' ) )
-      .pipe( minify({
+      .pipe( minify( {
         ext: {
-          src:'.min.js',
-          min:'.js'
-        }
-      }) )
+          src: '.min.js',
+          min: '.js',
+        },
+      } ) )
       .pipe( dest( DIR_OUTPUT_JS() ) );
 } );
 
@@ -267,7 +269,7 @@ task( 'build', done => {
   isBuild = true;
   series(
       'clean',
-      parallel( 'html:generate', 'scss:build', series('js:build', 'js:vendor'), 'images:process', 'fonts:copy' ),
+      parallel( 'html:generate', 'scss:build', series( 'js:build', 'js:vendor' ), 'images:process', 'fonts:copy' ),
   )();
   
   done();
