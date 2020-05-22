@@ -244,7 +244,7 @@ task( 'serve', () => {
 task( 'watch', ( c1 ) => {
     series( 'clean', parallel( 'html:generate', 'fonts:copy' ), 'serve' )();
     
-    watch( DIR_INPUT_SCSS )
+    watch( DIR_INPUT_SCSS, { awaitWriteFinish: true } )
         .on( 'ready', series( 'scss:compile' ) )
         .on( 'change', series( 'scss:compile' ) );
     
@@ -252,14 +252,14 @@ task( 'watch', ( c1 ) => {
     watch( [
         DIR_INPUT_HTML_TEMPLATES + '/**/*.html',
         DIR_INPUT_COPYTEXT + '/**/*',
-    ] )
+    ], { awaitWriteFinish: true } )
         .on( 'all', series( paniniRefresh, 'html:generate', browserSync.reload ) );
     
-    watch( DIR_INPUT_JS )
+    watch( DIR_INPUT_JS, { awaitWriteFinish: true } )
         .on( 'ready', series( 'js' ) )
         .on( 'change', series( 'js', browserSync.reload ) );
     
-    watch( DIR_INPUT_IMAGES )
+    watch( DIR_INPUT_IMAGES, { awaitWriteFinish: true } )
         .on( 'ready', series( 'images:copy' ) )
         .on( 'change', series( 'images:copy' ) );
 } );
