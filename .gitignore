@@ -154,6 +154,7 @@ node_modules.nosync
 
 
 # custom
-public/
+dist/
+public_temp/
 
 

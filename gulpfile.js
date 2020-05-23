@@ -28,7 +28,7 @@ const
     /* ROOT DIRECTORIES */
     SRC_PATH                 = './src',
     DIST_PATH                = './dist',
-    PUBLIC_PATH              = './public',
+    PUBLIC_PATH              = './public_temp',
     
     
     /* INPUT DIRECTORIES */
@@ -235,7 +235,7 @@ task( 'fonts:copy', () => {
 task( 'serve', () => {
     return browserSync.init( {
         server: {
-            baseDir: './public/',
+            baseDir: './public_temp/',
             injectChanges: true,
         },
     } );
