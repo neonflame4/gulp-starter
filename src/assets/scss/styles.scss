@@ -7,8 +7,8 @@ html, body {
 }
 
 body {
-  background: black;
-  color: white;
+  background: white;
+  color: black;
   font-family: Arial;
 }
 
@@ -16,10 +16,26 @@ a {
   color: #FFF;
 }
 
+ul.no-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+%content_wrapper {
+  width: 100%;
+  max-width: $content-width-max;
+  display: block;
+  margin: 0 auto;
+}
+
 header {
   width: 100%;
-  min-height: 150px;
-  background: linear-gradient(blue, #000);
+  min-height: 9rem;
+  background: #EEEEEE;
+
+  .header-content-wrapper {
+    @extend %content_wrapper;
+  }
 }
 
 footer {
@@ -27,6 +43,16 @@ footer {
   width: 100%;
   bottom: 0;
   left: 0;
-  min-height: 150px;
-  background: linear-gradient(#000, green);
+  min-height: 9rem;
+  background: #666666;
+  color: white;
+  font-size: .8rem;
+
+  .footer-content-wrapper {
+    @extend %content_wrapper;
+  }
+}
+
+header, footer {
+  padding: 2rem;
 }
