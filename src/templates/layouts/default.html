@@ -9,7 +9,7 @@
   <link rel="stylesheet" type="text/css" href="assets/css/styles.css">
   
   <!-- Custom JS -->
-  {{#if global.isProduction}}
+  {{#if config.isProduction}}
   <script type="text/javascript" src="assets/js/bundle.min.js"></script>
   {{else}}
   <script type="text/javascript" src="assets/js/bundle.js"></script>
@@ -18,7 +18,12 @@
 
 <body>
 {{> header}}
-{{> body}}
-{{> footer}}
+
+<div class="content-body-wrapper">
+  {{> body}}
+  
+  {{> footer}}
+</div>
+
 </body>
 </html>

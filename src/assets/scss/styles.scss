@@ -12,10 +12,6 @@ body {
   font-family: Arial;
 }
 
-a {
-  color: #FFF;
-}
-
 ul.no-list {
   list-style-type: none;
   padding: 0;
@@ -26,6 +22,7 @@ ul.no-list {
   max-width: $content-width-max;
   display: block;
   margin: 0 auto;
+  padding: 1rem;
 }
 
 header {
@@ -36,6 +33,11 @@ header {
   .header-content-wrapper {
     @extend %content_wrapper;
   }
+}
+
+.content-body-wrapper {
+  @extend %content_wrapper;
+  padding: 2rem;
 }
 
 footer {
@@ -54,5 +56,5 @@ footer {
 }
 
 header, footer {
-  padding: 2rem;
+  padding: 1rem;
 }
