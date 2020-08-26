@@ -32,7 +32,6 @@ const
     
     
     /* INPUT DIRECTORIES */
-    DIR_INPUT_FONTS          = SRC_PATH + '/assets/fonts/**/*.scss',
     DIR_INPUT_HTML           = [
         SRC_PATH + '/**/*.{htm,html,xhtml,php}',
         '!' + SRC_PATH + '/assets/**/*',
@@ -61,12 +60,19 @@ const
     DIR_INPUT_COPYTEXT       = SRC_PATH + '/data',
     DIR_INPUT_COPYTEXT_PROD  = SRC_PATH + '/prod_data',
     
+    DIR_ASSETS               = [
+        SRC_PATH + '/assets/**/*',
+        '!' + DIR_INPUT_PROCESS_IMAGES,
+        '!' + DIR_INPUT_JS_BASE,
+        '!' + DIR_INPUT_SCSS,
+    ],
+    
     
     /* OUTPUT DIRECTORIES */
     DIR_OUTPUT_CSS           = function () { return getOutputPath() + '/assets/css';},
-    DIR_OUTPUT_FONTS         = function () { return getOutputPath() + '/assets/fonts';},
     DIR_OUTPUT_IMAGES        = function () { return getOutputPath() + '/assets/images';},
-    DIR_OUTPUT_JS            = function () { return getOutputPath() + '/assets/js';}
+    DIR_OUTPUT_JS            = function () { return getOutputPath() + '/assets/js';};
+DIR_OUTPUT_ASSETS_ROOT       = function () { return getOutputPath() + '/assets';}
 ;
 
 
@@ -90,6 +96,11 @@ task( 'clean', () => {
         .pipe( clean() );
 } );
 
+task( 'assets:copy', () => {
+    return src( DIR_ASSETS )
+        .pipe( browserSync.stream() )
+        .pipe( dest( DIR_OUTPUT_ASSETS_ROOT ) );
+} );
 
 
 
@@ -194,7 +205,7 @@ task( 'images:copy', () => {
 } );
 
 task( 'images:process', () => {
-    return src( DIR_INPUT_PROCESS_IMAGES + '/**/*.{jpg,jpeg,png,gif}' )
+    return src( DIR_INPUT_PROCESS_IMAGES + '/**/*.{jpg,jpeg,png,gif}', { nocase: true } )
         .pipe( imageResize( {
             quality: 0.5,
             height: config.image_max_height,
@@ -209,7 +220,7 @@ task( 'images:thumbnail', cb => {
     if (!args[ 'folder' ])
         cb();
     
-    return src( DIR_INPUT_PROCESS_IMAGES + '/' + args.folder + '/*.{jpg,jpeg,png,gif}' )
+    return src( DIR_INPUT_PROCESS_IMAGES + '/' + args.folder + '/*.{jpg,jpeg,png,gif}', { nocase: true } )
         .pipe( imageResize( {
             quality: 1,
             height: config.thumbnail_max_height,
@@ -217,15 +228,6 @@ task( 'images:thumbnail', cb => {
             imageMagick: config.use_imagemagick,
         } ) )
         .pipe( dest( DIR_INPUT_PROCESS_IMAGES + '/' + args.folder + '_thumb' ) );
-} );
-
-
-
-
-/* ****************** FONT TASKS ******************* */
-task( 'fonts:copy', () => {
-    return src( DIR_INPUT_FONTS )
-        .pipe( dest( DIR_OUTPUT_FONTS() ) );
 } );
 
 
@@ -242,12 +244,14 @@ task( 'serve', () => {
 } );
 
 task( 'watch', ( c1 ) => {
-    series( 'clean', parallel( 'html:generate', 'fonts:copy' ), 'serve' )();
+    series( 'clean', parallel( 'assets:copy', 'html:generate' ), 'serve' )();
+    
+    watch( DIR_ASSETS, { awaitWriteFinish: true } )
+        .on( 'all', series( 'assets:copy' ) );
     
     watch( DIR_INPUT_SCSS, { awaitWriteFinish: true } )
         .on( 'ready', series( 'scss:compile' ) )
         .on( 'change', series( 'scss:compile' ) );
-    
     
     watch( [
         DIR_INPUT_HTML_TEMPLATES + '/**/*.html',
@@ -260,8 +264,7 @@ task( 'watch', ( c1 ) => {
         .on( 'change', series( 'js', browserSync.reload ) );
     
     watch( DIR_INPUT_IMAGES, { awaitWriteFinish: true } )
-        .on( 'ready', series( 'images:copy' ) )
-        .on( 'change', series( 'images:copy' ) );
+        .on( 'all', series( 'images:copy' ) );
 } );
 
 
@@ -269,7 +272,8 @@ task( 'build', done => {
     isBuild = true;
     series(
         'clean',
-        parallel( 'html:generate', 'scss:build', series( 'js:build', 'js:vendor' ), 'images:process', 'fonts:copy' ),
+        'assets:copy',
+        parallel( 'html:generate', 'scss:build', series( 'js:build', 'js:vendor' ), 'images:process' ),
     )();
     
     done();
