@@ -9,10 +9,10 @@
   "author": "Mark Nagengast",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.9.0",
-    "@babel/preset-env": "^7.9.0",
-    "autoprefixer": "^9.7.5",
-    "browser-sync": "^2.26.12",
+    "@babel/core": "^7.14.0",
+    "@babel/preset-env": "^7.14.1",
+    "autoprefixer": "^9.8.6",
+    "browser-sync": "^2.26.14",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-clean": "^0.4.0",
@@ -20,13 +20,13 @@
     "gulp-image-resize": "^0.13.1",
     "gulp-minify": "^3.1.0",
     "gulp-postcss": "^8.0.0",
-    "gulp-sass": "^4.0.2",
+    "gulp-sass": "^4.1.0",
     "gulp-sourcemaps": "^2.6.5",
     "panini": "^1.7.1",
-    "yargs": "^15.3.1"
+    "yargs": "^15.4.1"
   },
   "dependencies": {
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "lodash.template": "^4.5.0"
   },
   "browserslist": [
